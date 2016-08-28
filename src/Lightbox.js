@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 // import Swipeable from 'react-swipeable';
+import YouTube from 'react-youtube';
 
 import theme from './theme';
 import Arrow from './components/Arrow';
@@ -211,13 +212,8 @@ class Lightbox extends Component {
 		const thumbnailsSize = showThumbnails ? theme.thumbnail.size : 0;
 		const heightOffset = `${theme.header.height + theme.footer.height + thumbnailsSize + (theme.container.gutter.vertical)}px`;
 
-		return (
-			<figure className={css(classes.figure)}>
-				{/*
-					Re-implement when react warning "unknown props"
-					https://fb.me/react-unknown-prop is resolved
-					<Swipeable onSwipedLeft={this.gotoNext} onSwipedRight={this.gotoPrev} />
-				*/}
+		function renderImageType() {
+			return(
 				<img
 					className={css(classes.image)}
 					onClick={!!onClickImage && onClickImage}
@@ -229,6 +225,36 @@ class Lightbox extends Component {
 						maxHeight: `calc(100vh - ${heightOffset})`,
 					}}
 				/>
+			)
+		}
+
+		function renderYouTubeType() {
+			return(
+				<div
+					className={css(classes.video)}>
+					<YouTube
+						videoId={image.id}
+						opts={{
+							width: '100%',
+							height: '100%',
+							margin: 0,
+							padding: 0
+						}}
+					/>
+				</div>
+			)
+		}
+
+		return (
+			<figure className={css(classes.figure)}>
+				{/*
+					Re-implement when react warning "unknown props"
+					https://fb.me/react-unknown-prop is resolved
+					<Swipeable onSwipedLeft={this.gotoNext} onSwipedRight={this.gotoPrev} />
+				*/}
+
+				{(images[currentImage].type == 'image') ? renderImageType.call(this) : renderYouTubeType.call(this)}
+
 				<Footer
 					caption={images[currentImage].caption}
 					countCurrent={currentImage + 1}
@@ -323,6 +349,17 @@ const classes = StyleSheet.create({
 		WebkitTouchCallout: 'none',
 		userSelect: 'none',
 	},
+	video: {
+		display: 'block', // removes browser default gutter
+		height: 'auto',
+		margin: '0 auto', // maintain center on very short screens OR very narrow image
+		width: '100%',
+		maxWidth: '100%',
+
+		// disable user select
+		WebkitTouchCallout: 'none',
+		userSelect: 'none',
+	}
 });
 
 export default Lightbox;
